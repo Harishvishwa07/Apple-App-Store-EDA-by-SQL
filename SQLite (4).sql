@@ -14,59 +14,59 @@ UNION ALL
 
 SELECT * FROM appleStore_description4;
 
-** EXPLORATORY DATA ANALYSIS **
+** EXPLORATORY_DATA_ANALYSIS **
 
 -- Check the no. of unique apps in both the applestore tablesAppleStore
 
-SELECT count (DISTINCT id) as UniqueAppIDs
-from AppleStore;
+SELECT COUNT (DISTINCT id) AS UniqueAppIDs
+FROM AppleStore;
 
-SELECT count (DISTINCT id) as UniqueAppIDs
-from applestore_description_combined;
+SELECT COUNT (DISTINCT id) AS UniqueAppIDs
+FROM applestore_description_combined;
 
 -- Check for any missing values
 
-SELECT COUNT(*) as MissingValues
-from AppleStore
-where track_name is null or user_rating is null or prime_genre is NULL;
+SELECT COUNT(*) AS MissingValues
+FROM AppleStore
+WHERE track_name IS NULL OR user_rating IS NULL OR prime_genre IS NULL;
 
 
-SELECT COUNT(*) as MissingValues
-from applestore_description_combined
-where app_desc is NULL;
+SELECT COUNT(*) AS MissingValues
+FROM applestore_description_combined
+WHERE app_desc IS NULL;
 
 -- Find out the no. of apps per genre
 
-SELECT prime_genre, COUNT(*) as NumApps
-from AppleStore
-GROUP by prime_genre
-order BY NumApps DESC;
+SELECT prime_genre, COUNT(*) AS NumApps
+FROM AppleStore
+GROUP By prime_genre
+ORDER BY NumApps DESC;
 
 -- Get an overview of the app's ratings
 
-SELECT min(user_rating) as MinRating,
-       max(user_rating) as MaxRating,
-       avg(user_rating) as AvgRating
+SELECT MIN(user_rating) AS MinRating,
+       MAX(user_rating) AS MaxRating,
+       AVG(user_rating) AS AvgRating
 FROM AppleStore;
 
 -- Determine whether paid apps have higher ratings than free appsAppleStore
 
 SELECT CASE
-            when price > 0 then 'Paid'
+            WHEN price > 0 THEN 'Paid'
             ELSE 'Free'
-            end as App_Type,
-            avg(user_rating) as AvgRating
+            END AS App_Type,
+            avg(user_rating) AS AvgRating
 FROM AppleStore
 GROUP BY App_Type;
 
 -- Check if apps with more supported languages have higher ratings
 
 SELECT CASE
-           when lang_num < 10 THEN '< 10 languages'
-           WHEn lang_num BETWEEN 10 and 30 THEN '10 to 30 languages'
-           else '>30 languages'
-         end as Language_bucket,
-         avg(user_rating) as AvgRating
+           WHEN lang_num < 10 THEN '< 10 languages'
+           WHEN lang_num BETWEEN 10 AND 30 THEN '10 to 30 languages'
+           ELSE '>30 languages'
+         END AS Language_bucket,
+         avg(user_rating) AS AvgRating
 FROM AppleStore
 GROUP BY Language_bucket
 ORDER BY AvgRating DESC;
@@ -74,7 +74,7 @@ ORDER BY AvgRating DESC;
 -- Check genre with low ratings
 
 SELECT prime_genre,
-       avg(user_rating) as AvgRating
+       avg(user_rating) AS AvgRating
 FROM AppleStore
 GROUP BY prime_genre
 ORDER BY AvgRating ASC
@@ -83,13 +83,13 @@ LIMIT 10;
 -- Check if there is any correlation between the length of the app description and user rating
 
 SELECT CASE
-           when length (B.app_desc) < 500 THEN 'Short'
+           WHEN length (B.app_desc) < 500 THEN 'Short'
            WHEN length(B.app_desc) BETWEEN 500 AND 1000 THEN 'Medium'
            ELSE 'Long'
-end as description_length_bucket,
-avg(A.user_rating) as AvgRating
+END AS description_length_bucket,
+avg(A.user_rating) AS AvgRating
 
-from AppleStore A
+FROM AppleStore A
 JOIN
 applestore_description_combined B
 ON A.id = B.id
@@ -108,11 +108,11 @@ FROM (
       prime_genre,
       track_name,
       user_rating,
-      RANK() OVER(PARTITION BY prime_genre ORDER BY user_rating DESC, rating_count_tot DESC) as rank
+      RANK() OVER(PARTITION BY prime_genre ORDER BY user_rating DESC, rating_count_tot DESC) AS rank
       FROM
       AppleStore
       )
-      as A
+      AS A
 WHERE
 A.rank = 1;
 
